@@ -4,23 +4,23 @@ import os
 import sys
 import traceback
 from contextlib import ExitStack
+import gzip
 
-import emoji
 import requests
 from tqdm import tqdm
 
 
 logging.getLogger().setLevel(logging.INFO)
 
-BEARER_TOKEN = os.environ.get("BEARER_TOKEN")
+BEARER_TOKEN = os.environ["BEARER_TOKEN"]
 
 
 class KeyedWriter:
-    def __init__(self, dir: str):
+    def __init__(self, dir: str, compress: bool = False):
         if not os.path.exists(dir):
             os.makedirs(dir)
         assert os.path.isdir(dir)
-
+        self._compress = compress
         self._dir = dir
         self._handlers = dict()
     
@@ -36,8 +36,11 @@ class KeyedWriter:
             return self._handlers[key]
         except KeyError:
             output_path = os.path.join(self._dir, key)
+            if self._compress:
+                output_path += '.gz'
+
             logging.info("Opening new file: %s", output_path)
-            h = open(output_path, "ab")
+            h = (gzip.open if self._compress else open)(output_path, "ab")
             self._stack.enter_context(h)
             self._handlers[key] = h
             return h
@@ -49,9 +52,6 @@ def bearer_oauth(r):
     r.headers["User-Agent"] = "v2FilteredStreamPython"
     return r
 
-
-def has_emoji(text):
-    return bool(emoji.emoji_list(text))
 
 def get_stream(output_dir: str):
     """Collect all available tweets with details."""
@@ -74,16 +74,14 @@ def get_stream(output_dir: str):
         }
     )
 
-    assert response.status_code == 200
+    if response.status_code != 200:
+        print(response.status_code, response.text, response.headers)
+    assert response.status_code == 200  
 
-    total = emoji_count = 0
-    with KeyedWriter(output_dir) as output, tqdm(response.iter_lines(), smoothing=0.04) as progress:
+    with KeyedWriter(output_dir, compress=True) as output, tqdm(response.iter_lines(), smoothing=0.04) as progress:
         for response_line in progress:
             if not response_line: continue
             json_response = json.loads(response_line)
-            total += 1
-            emoji_count += has_emoji(json_response["data"]["text"])
-            progress.set_postfix(ratio=("%.3f"%(emoji_count/total)), total=total)
 
             key = json_response["data"]["created_at"].split("T")[0] + ".jsonl"
             output[key].write(response_line + b"\n")
