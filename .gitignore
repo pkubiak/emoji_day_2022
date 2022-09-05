@@ -1,2 +1,6 @@
 *.jsonl
 venv/
+venv2/
+drafts/
+streams/
+**/__pycache__/
