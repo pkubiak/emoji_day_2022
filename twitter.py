@@ -5,7 +5,7 @@ import sys
 import traceback
 from contextlib import ExitStack
 import gzip
-
+import time
 import requests
 from tqdm import tqdm
 
@@ -49,15 +49,16 @@ class KeyedWriter:
 def bearer_oauth(r):
     """Method required by bearer token authentication."""
     r.headers["Authorization"] = f"Bearer {BEARER_TOKEN}"
-    r.headers["User-Agent"] = "v2FilteredStreamPython"
+    r.headers["User-Agent"] = "v2SampleStreamPython"
     return r
+
 
 
 def get_stream(output_dir: str):
     """Collect all available tweets with details."""
     # ref: https://developer.twitter.com/en/docs/twitter-api/tweets/volume-streams/api-reference/get-tweets-sample-stream
-    response = requests.get(
-        "https://api.twitter.com/2/tweets/sample/stream?", auth=bearer_oauth, stream=True,
+    request = requests.get(
+        "https://api.twitter.com/2/tweets/sample/stream?", auth=bearer_oauth, stream=True, timeout=(10, 20),
         params={
             "tweet.fields": ",".join([
                 "attachments", 
@@ -74,17 +75,20 @@ def get_stream(output_dir: str):
         }
     )
 
-    if response.status_code != 200:
-        print(response.status_code, response.text, response.headers)
-    assert response.status_code == 200  
+    with request as response:
+        if response.status_code != 200:
+            print(response.status_code, response.text, response.headers)
+        if response.status_code == 429:
+            time.sleep(60)
+        assert response.ok
 
-    with KeyedWriter(output_dir, compress=True) as output, tqdm(response.iter_lines(), smoothing=0.04) as progress:
-        for response_line in progress:
-            if not response_line: continue
-            json_response = json.loads(response_line)
+        with KeyedWriter(output_dir, compress=True) as output, tqdm(response.iter_lines(), smoothing=0.04) as progress:
+            for response_line in progress:
+                if not response_line: continue
+                json_response = json.loads(response_line)
 
-            key = json_response["data"]["created_at"].split("T")[0] + ".jsonl"
-            output[key].write(response_line + b"\n")
+                key = json_response["data"]["created_at"].split("T")[0] + ".jsonl"
+                output[key].write(response_line + b"\n")
 
 
 if __name__ == "__main__":
@@ -95,3 +99,4 @@ if __name__ == "__main__":
             break
         except Exception:
             traceback.print_exc()
+        time.sleep(5)
