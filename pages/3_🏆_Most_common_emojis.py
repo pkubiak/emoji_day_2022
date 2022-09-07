@@ -1,27 +1,24 @@
-from utils import iteratate_tweets, render_as_table
-import emoji
+from utils import get_tsv_data, render_as_table
 import streamlit as st
-from collections import Counter
+from functools import reduce
+import emoji
 
 
-@st.experimental_memo(persist="disk")
-def get_emojis():
-    c = Counter()
-    sources = {"Twitter for Android", "Twitter for iPhone", "Twitter Web App", "Twitter for Mac", "Twitter for iPad"}
-    for tweet in iteratate_tweets("streams"):
-        source = tweet["data"]["source"]
-        if source not in sources:
-            continue
-        # sensitive = tweet["data"].get("possibly_sensitive", False)
-        # if sensitive is not True:
-        #     continue
-        text = tweet["data"]["text"]
-        emojis = emoji.emoji_list(text)
-        c.update(e['emoji'] for e in emojis)
+@st.experimental_memo()
+def get_data():
+    # TODO: Add source filtering
+    # sources = {"Twitter for Android", "Twitter for iPhone", "Twitter Web App", "Twitter for Mac", "Twitter for iPad"}
 
-    return c
+    data = get_tsv_data("emoji_frequency", index_col="Emoji", dtype={"Count": "int"})
+    data = list(data)
+    for d in data:
+        print(d.dtypes)
 
-# get_emojis.clear()
+    # ref: https://stackoverflow.com/a/38472352/5822988
+    df = reduce(lambda a, b: a.add(b, fill_value=0), data)
+    df["Count"] = df["Count"].astype("int")
+
+    return df.sort_values(by="Count", ascending=False)
 
 
 ##################
@@ -29,25 +26,33 @@ def get_emojis():
 st.title("🏆 Most Common Emojis")
 st.caption("List of most common emojis")
 
-items = list(get_emojis().most_common())
+counts = get_data()
 
 col1, col2, col3 = st.columns(3)
-total = sum(i[1] for i in items)
+total = counts["Count"].sum()
 col1.metric("Total emojis", f"{total:,d}")
-col2.metric("Unique emojis", f"{len(items):,d}")
+col2.metric("Unique emojis", f"{len(counts):,d}")
 
-st.warning('This is a warning', icon="⚠️")
+# st.subheader("Log-Frequency plot")
+# st.info("TBA")
 
-st.header("Most common Emojis Ranking")
+st.subheader("Ranking")
 
-show_as = st.radio("Show as:", ('counts', 'percentage'), horizontal=True)
+show_as = st.radio("Show as:", ("counts", "percentage"), horizontal=True)
+
 if show_as == "percentage":
-    items = [[i[0], round(100*i[1]/total,3)] for i in items]
-print(items[:10])
+    counts["Count"] = (100.0 * counts["Count"] / total).round(3)
+
+items = counts.reset_index().values.tolist()
+items = [
+    item + [f"#{i} - {emoji.demojize(item[0])}"]
+    for i, item in enumerate(items, start=1)
+]
 
 start = 0
 per_page = 100
 while start < len(items):
     st.subheader(f"#{start+1} - #{start+per_page}")
-    st.markdown(render_as_table(items[start:start+per_page]), unsafe_allow_html=True)
+    html_table = render_as_table(items[start : start + per_page])
+    st.markdown(html_table, unsafe_allow_html=True)
     start += per_page
