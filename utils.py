@@ -1,6 +1,5 @@
 from typing import Iterable, Dict
 import glob, json, os
-import emoji
 import pandas as pd
 
 Tweet = Dict
@@ -51,12 +50,15 @@ def render_as_table(items, n_cols: int = 6, limit: int = None) -> str:
             if i >= len(items):
                 html += ['<td></td>']
                 continue
-            value = items[i][1]
+            key, value, *title = items[i]
+            title = f" title={repr(title[0])}" if title else ""
+
             if type(value) == int:
                 value = f"{value:,d}"
             else:
                 value = "<0.001%" if value < 0.001 else f"{value:.3f}%"
-            html += [f"<td title='{emoji.demojize(items[i][0])}'>{items[i][0]}<span style='float:right'>{value}</span></td>"]
+
+            html += [f"<td{title}>{key}<span style='float:right'>{value}</span></td>"]
         html += ["</tr>"]
     html += ["</table>"]
 
