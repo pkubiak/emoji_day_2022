@@ -11,8 +11,6 @@ def get_data():
 
     data = get_tsv_data("emoji_frequency", index_col="Emoji", dtype={"Count": "int"})
     data = list(data)
-    for d in data:
-        print(d.dtypes)
 
     # ref: https://stackoverflow.com/a/38472352/5822988
     df = reduce(lambda a, b: a.add(b, fill_value=0), data)

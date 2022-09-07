@@ -66,7 +66,6 @@ def render_as_table(items, n_cols: int = 6, limit: int = None) -> str:
 
 def get_tsv_data(key: str, **kwargs) -> Iterable[pd.DataFrame]:
     for path in glob.glob(os.path.join(os.path.dirname(__file__), "data","*",f"{key}.tsv")):
-        print(os.path.abspath(path))
         df = pd.read_csv(path, sep="\t", **kwargs)
         # dfs.append(df)
         yield df
