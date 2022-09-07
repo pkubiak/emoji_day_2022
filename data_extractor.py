@@ -4,7 +4,7 @@ import pandas as pd
 from utils import iterate_dates_range, chunk
 from tqdm import tqdm
 from typing import Iterable, Dict
-
+import emoji
 
 def extract_tweets(dir: str, date: str):
     path = os.path.join(dir, f"{date}.jsonl")
@@ -19,6 +19,9 @@ def extract_tweets(dir: str, date: str):
 
 
 class Collector:
+    def __init__(self):
+        self.clear()
+
     def __ilshift__(self, tweets):
         if not isinstance(tweets, list):
             tweets = [tweets]
@@ -35,9 +38,6 @@ class TweetsPerHourCollector(Collector):
         self.counts = Counter()
         self.seconds = defaultdict(set)
 
-    def __init__(self):
-        self.clear()
-
     def collect(self, tweets: Iterable[Dict]) -> None:
         for tweet in tweets:
             hour, rem  = tweet["data"]["created_at"].split(":", maxsplit=1)
@@ -53,8 +53,29 @@ class TweetsPerHourCollector(Collector):
         ).sort_values(by=["Day", "Hour"])
 
 
+class EmojiFrequenceCollector(Collector):
+    """Count frequency of Emojis."""
+
+    def clear(self):
+        self.counts = Counter()
+    
+    def collect(self, tweets: Iterable[Dict]) -> None:
+        for tweet in tweets:
+            text = tweet["data"]["text"]
+            self.counts.update(i["emoji"] for i in emoji.emoji_list(text))
+
+    def df(self) -> pd.DataFrame:
+        return pd.DataFrame(
+            [[k, v] for k, v in self.counts.most_common()],
+            columns=["Emoji", "Count"]
+        ).sort_values(by=["Count", "Emoji"], ascending=False)
+
+
 if __name__ == "__main__":
-    collectors = {"tweets_per_hour": TweetsPerHourCollector()}
+    collectors = {
+        "tweets_per_hour": TweetsPerHourCollector(),
+        "emoji_frequency": EmojiFrequenceCollector()
+    }
 
     for date in iterate_dates_range("2022-09-02", "2022-09-06"):
         print("=" * 16, date, "=" * 16)
