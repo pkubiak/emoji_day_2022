@@ -62,13 +62,13 @@ def render_as_table(items, n_cols: int = 6, limit: int = None) -> str:
 
     return "\n".join(html)
 
-def get_tsv_data(key: str, **kwargs):
-    dfs = []
+def get_tsv_data(key: str, **kwargs) -> Iterable[pd.DataFrame]:
     for path in glob.glob(os.path.join(os.path.dirname(__file__), "data","*",f"{key}.tsv")):
         print(os.path.abspath(path))
         df = pd.read_csv(path, sep="\t", **kwargs)
-        dfs.append(df)
-    return pd.concat(dfs, ignore_index=True)
+        # dfs.append(df)
+        yield df
+    # return pd.concat(dfs, ignore_index=True)
     
 
 def chunk(items, chunk_size: int = 1000):
