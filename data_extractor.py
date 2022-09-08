@@ -61,7 +61,7 @@ class EmojiFrequenceCollector(Collector):
     
     def collect(self, tweets: Iterable[Dict]) -> None:
         for tweet in tweets:
-            text = tweet["data"]["text"]
+            text = tweet["data"]["text"]            
             self.counts.update(i["emoji"] for i in emoji.emoji_list(text))
 
     def df(self) -> pd.DataFrame:
@@ -71,26 +71,63 @@ class EmojiFrequenceCollector(Collector):
         ).sort_values(by=["Count", "Emoji"], ascending=False)
 
 
+class FieldStatisticsCollector(Collector):
+    def __init__(self, field: str, limit: int = 500):
+        super()
+        self.field = field.split(".")
+        self.limit = limit
+
+    def clear(self):
+        self.counts = Counter()
+
+    def collect(self, tweets: Iterable[Dict]) -> None:
+        for tweet in tweets:
+            value = tweet
+            for k in self.field:
+                if k not in value:
+                    value = None
+                    break
+                value = value[k]
+            
+            self.counts[str(value)] += 1
+        
+    def df(self) -> pd.DataFrame:
+        return pd.DataFrame(
+            [[k, v] for k, v in self.counts.most_common()],
+            columns=["Value", "Count"]
+        ).sort_values(by=["Count", "Value"], ascending=False).head(self.limit)
+
+
 if __name__ == "__main__":
     collectors = {
         "tweets_per_hour": TweetsPerHourCollector(),
-        "emoji_frequency": EmojiFrequenceCollector()
+        "emoji_frequency": EmojiFrequenceCollector(),
+        "statistics_lang":  FieldStatisticsCollector("data.lang"),
+        "statistics_source": FieldStatisticsCollector("data.source"),
     }
 
-    for date in iterate_dates_range("2022-09-02", "2022-09-06"):
+    for date in iterate_dates_range("2022-09-02", "2022-09-07"):
         print("=" * 16, date, "=" * 16)
+        current_collectors = {}
 
-        for collector in collectors.values():
+        for name, collector in collectors.items():
             collector.clear()
+            output_path = os.path.join("data", date, f"{name}.tsv")
+            os.makedirs(os.path.dirname(output_path), exist_ok=True)
+            if os.path.exists(output_path):
+                print(f"Skipping collecting: {output_path}")
+            else:
+                current_collectors[output_path] = collector
+
+        if not current_collectors:
+            continue
 
         with tqdm(extract_tweets("streams", date), leave=False) as it:
             for tweets in chunk(it):
-                for collector in collectors.values():
+                for collector in current_collectors.values():
                     collector <<= tweets
 
-        for name, collector in collectors.items():
-            output_path = os.path.join("data", date, f"{name}.tsv")
-            os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        for output_path, collector in current_collectors.items():
             df = collector.df()
 
             print(f"Saving to {output_path}")

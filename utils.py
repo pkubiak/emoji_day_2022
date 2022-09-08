@@ -1,6 +1,8 @@
 from typing import Iterable, Dict
 import glob, json, os
 import pandas as pd
+from functools import reduce
+
 
 Tweet = Dict
 
@@ -70,6 +72,14 @@ def get_tsv_data(key: str, **kwargs) -> Iterable[pd.DataFrame]:
         # dfs.append(df)
         yield df
     # return pd.concat(dfs, ignore_index=True)
+
+
+def sum_tsv_data(key: str, **kwargs):
+    data = get_tsv_data(key, **kwargs)
+
+    # ref: https://stackoverflow.com/a/38472352/5822988
+    df = reduce(lambda a, b: a.add(b, fill_value=0), data)
+    return df
     
 
 def chunk(items, chunk_size: int = 1000):
