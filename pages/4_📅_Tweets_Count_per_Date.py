@@ -30,7 +30,7 @@ def build_bokeh_chart(df, field: str):
             ("coverage", "@{Coverage%}{0.2f}%"),
             ("tweets per sec.", "@{Tweets/s}{0.2f}"),
         ],
-        x_axis_label="Hour",
+        x_axis_label="Hour [UTC]",
     )
 
     p.grid.grid_line_color = None
