@@ -1,6 +1,11 @@
 import streamlit as st
 # st.file
 
+st.set_page_config(
+    page_title="Twitter Emoji Analysis",
+    page_icon="🌵",
+)
+
 """
 # This is the document title
 
