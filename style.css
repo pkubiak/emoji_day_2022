@@ -1,0 +1,23 @@
+section[data-testid="stSidebar"] h2 {
+    margin: 0; margin-top: 1rem; padding: 0; font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
+    display: block;
+}
+
+section[data-testid="stSidebar"] button[kind=primary] {
+    display: block;text-align: left;
+    border: 0;margin: 0.25em 0;background: transparent;padding:0.15em;;
+    border-radius: 0;
+    margin-left: -1rem;
+    padding-left: 1.25rem;
+    margin-right: -1rem;
+    width: calc(100% + 2rem);
+}
+section[data-testid="stSidebar"] button[kind=primary]:hover {
+    background: rgba(151, 166, 195, 0.15);
+    color: black;
+}

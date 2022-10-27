@@ -1,10 +1,11 @@
-import os, json, gzip
+import os, json, gzip, glob, datetime
 from collections import Counter, defaultdict
 import pandas as pd
-from utils import iterate_dates_range, chunk
+from utils import chunk
 from tqdm import tqdm
 from typing import Iterable, Dict
 import emoji
+
 
 def extract_tweets(dir: str, date: str):
     path = os.path.join(dir, f"{date}.jsonl")
@@ -16,6 +17,20 @@ def extract_tweets(dir: str, date: str):
             tweet = json.loads(line.decode("utf-8"))
             yield tweet
 
+
+def collect_available_streams(dir: str = "streams") -> Iterable[str]:
+    """Compute list of dates for which we have downloaded streams in `dir` location."""
+    dates = set()
+    for ext in (".jsonl", ".jsonl.gz"):
+        for path in glob.glob(os.path.join(dir, f"*{ext}")):
+            print(path)
+            date = os.path.basename(path).removesuffix(ext)
+            try:
+                datetime.datetime.strptime(date, "%Y-%m-%d")
+                dates.add(date)
+            except ValueError:
+                pass
+    return sorted(dates)
 
 
 class Collector:
@@ -96,7 +111,7 @@ class FieldStatisticsCollector(Collector):
             [[k, v] for k, v in self.counts.most_common()],
             columns=["Value", "Count"]
         ).sort_values(by=["Count", "Value"], ascending=False).head(self.limit)
-
+            
 
 if __name__ == "__main__":
     collectors = {
@@ -106,7 +121,7 @@ if __name__ == "__main__":
         "statistics_source": FieldStatisticsCollector("data.source"),
     }
 
-    for date in iterate_dates_range("2022-09-02", "2022-09-07"):
+    for date in collect_available_streams():
         print("=" * 16, date, "=" * 16)
         current_collectors = {}
 
