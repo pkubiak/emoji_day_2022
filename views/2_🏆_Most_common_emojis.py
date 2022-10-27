@@ -1,7 +1,7 @@
 from utils import get_tsv_data, render_as_table
 import streamlit as st
 from functools import reduce
-import emoji
+import emoji, re
 
 
 @st.experimental_memo()
@@ -15,8 +15,29 @@ def get_data():
     # ref: https://stackoverflow.com/a/38472352/5822988
     df = reduce(lambda a, b: a.add(b, fill_value=0), data)
     df["Count"] = df["Count"].astype("int")
+    df.sort_values(by="Count", ascending=False, inplace=True)
+    from collections import Counter, defaultdict
+    # c =  Counter()
+    # d = defaultdict(list)
+    # for i in df.index:
+    #     c.update(map(ord,i))
+    #     for j in map(ord, i):
+    #         d[j].append(i)
+    
+    # print("-"*80)
+    # for k,v in c.most_common(40):
+    #     print(k, v, hex(k), chr(k), d[k][:10])
+    # print("-"*80)
+    #     # if chr(0xFE0E) in i or chr(0xFE0F) in i:
+    #     # # if chr(127987) in i:
+    #     #     print(i, list(map(ord,i)))
+    # print("*"*80)
+    
+    
+    
+    return df
 
-    return df.sort_values(by="Count", ascending=False)
+# 
 
 
 ##################
