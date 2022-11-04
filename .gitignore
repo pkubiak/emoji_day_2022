@@ -4,3 +4,4 @@ venv2/
 drafts/
 streams/
 **/__pycache__/
+settings.json
