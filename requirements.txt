@@ -3,3 +3,5 @@ requests
 tqdm
 pandas
 bokeh
+plotly
+streamlit==1.14.0
