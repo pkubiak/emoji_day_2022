@@ -10,7 +10,7 @@ VIEWS = [
     ("\uFE0F♂️\uFE0F vs ♀️\uFE0F", "gender-bias", "dashboards/05_gender_bias.py"),
 
     "Per Language",
-    ("🌍 Top Emojis by country", "top-by-country-and-language", "dashboards/03_top_emojis_by_category_and_language.py"),
+    ("🌍 Top Emojis in country", "top-by-country-and-language", "dashboards/03_top_emojis_by_category_and_language.py"),
     ("🥊 Emoji vs Emoji", "emoji-vs-emoji", "dashboards/04_emoji_vs_emoji.py"),
 
     "Tweets Statistics",
@@ -19,7 +19,7 @@ VIEWS = [
     
     "",
     ("🗂️ Glossary", "glossary", "glossary.py"),
-    ("🔧 About Dashboard", "about-dashboard", "placeholder.py"),
+    # ("🔧 About Dashboard", "about-dashboard", "placeholder.py"),
 ]
 
 

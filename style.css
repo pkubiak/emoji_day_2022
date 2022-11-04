@@ -8,8 +8,9 @@ section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
     display: block;
 }
 
-section[data-testid="stSidebar"] button[kind=primary] {
-    display: block;text-align: left;
+section[data-testid="stSidebar"] button[kind=secondary] {
+    display: block;
+    text-align: left;
     border: 0;margin: 0.25em 0;background: transparent;padding:0.15em;;
     border-radius: 0;
     margin-left: -1rem;
@@ -17,7 +18,7 @@ section[data-testid="stSidebar"] button[kind=primary] {
     margin-right: -1rem;
     width: calc(100% + 2rem);
 }
-section[data-testid="stSidebar"] button[kind=primary]:hover {
+section[data-testid="stSidebar"] button[kind=secondary]:hover {
     background: rgba(151, 166, 195, 0.15);
     color: black;
 }
