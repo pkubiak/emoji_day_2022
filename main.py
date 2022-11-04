@@ -2,7 +2,7 @@ from helpers.multi_app import MultiViewsApp
 
 
 VIEWS = [
-    ("🤩 Welcome", "welcome", "placeholder.py"),
+    ("🤩 Welcome", "welcome", "welcome.py"),
     
     "Emoji Statistics",
     ("🏆 Most common emojis", "most-common-emojis", "dashboards/01_most_common_emojis.py"),

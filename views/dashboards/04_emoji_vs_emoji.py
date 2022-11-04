@@ -42,7 +42,11 @@ def get_results(e1, e2) -> dict[str, str]:
 
 
 st.title("🥊 Emoji vs Emoji")
+st.markdown("""
+Dashboard compare usage of two emoji among different countries, and show the most used.
 
+Countries matching is based on national languages, and therefore may not be 100% accurate.
+""")
 examples = [("👍", "👎"), ("🐈", "🐕"), ("🍏","🍎"), ("🍆", "🍑"), ("🍷", "🍺"),]
 
 output = st.container()
@@ -69,6 +73,8 @@ with cols_inputs[1]:
 
 
 if not(emoji1 and emoji2):
+    with output:
+        st.warning("Select two emojis to show comparison")
     st.stop()
 
 if (emoji1 not in emoji.EMOJI_DATA) or (emoji2 not in emoji.EMOJI_DATA):
