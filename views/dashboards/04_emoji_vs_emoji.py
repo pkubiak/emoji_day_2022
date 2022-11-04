@@ -38,7 +38,11 @@ def get_results(e1, e2) -> dict[str, str]:
     #     if k not in LANG_TO_COUNTRY:
     #         missing[k] += sum(counts[k].values())
     # st.write(missing.most_common())
-    return results
+    overall = {
+        e1: sum(counts[k].get(e1,0) for k in counts),
+        e2: sum(counts[k].get(e2,0) for k in counts),
+    }
+    return results, overall
 
 
 st.title("🥊 Emoji vs Emoji")
@@ -47,16 +51,17 @@ Dashboard compare usage of two emoji among different countries, and show the mos
 
 Countries matching is based on national languages, and therefore may not be 100% accurate.
 """)
-examples = [("👍", "👎"), ("🐈", "🐕"), ("🍏","🍎"), ("🍆", "🍑"), ("🍷", "🍺"),]
+examples = [("😭", "😂"), ("🐈", "🐕"), ("🍏","🍎"), ("🍆", "🍑"), ("🍷", "🍺"),]
 
 output = st.container()
 cols_inputs = st.columns(2)
 cols = st.columns(len(examples)+1)
 
+
 # st.markdown("<a href='x'>Hello World</a>", unsafe_allow_html=True)
 
 
-cols[0].write("Examples:")
+cols[0].write("Try these:")
 for col, example in zip(cols[1:], examples):
     with col:
         if st.button(f"{example[0]} vs {example[1]}"):
@@ -81,13 +86,17 @@ if (emoji1 not in emoji.EMOJI_DATA) or (emoji2 not in emoji.EMOJI_DATA):
     st.error("Inserted text is not emoji!")
     st.stop()
 
-# st.subheader(f"{emoji1} vs {emoji2}")
-results = get_results(emoji1, emoji2)
+
+results, overall = get_results(emoji1, emoji2)
 keys = list(results.keys())
 values = list(results.values())
-colors = [(v == emoji1) if v else v for v in values]
-# print(results)
-fig = px.choropleth(locations=keys, color=colors)
+
+c1 = "#636EFA"
+c2 = "#EF553B"
+
+colors = [(c1 if v == emoji1 else c2) if v else v for v in values]
+
+fig = px.choropleth(locations=keys, color=colors, color_discrete_map="identity")
 
 fig.add_scattergeo(
   locations = keys,
@@ -95,25 +104,28 @@ fig.add_scattergeo(
   mode = 'text',textfont_size=24
 ) 
 fig.update(
-    layout_showlegend=False,        
-    # displayModeBar = False
-    
+    layout_showlegend=False,            
 )
 
 fig.update_layout(
     margin=dict(l=0, r=0, t=0, b=0),
     height=330,
-    # width=300,
-    # modebar_remove=[
-    #                  'zoom2d',
-    #                  'toggleSpikelines',
-    #                  'pan2d',
-    #                  'select2d',
-    #                  'lasso2d',
-    #                  'autoScale2d',
-    #                  'hoverClosestCartesian',
-    #                  'hoverCompareCartesian']
+
 )
+
+
 
 with output:
     st.plotly_chart(fig, use_container_width=False)
+    perc = (100.0 * overall[emoji1]) / (overall[emoji1] + overall[emoji2])
+    st.markdown(f"""
+        <div style="display:flex; align-items: center;padding-bottom: 20px;">
+            <span>{emoji1}</span>
+            <div style="flex-grow:1;height:10px;background:{c2};margin: 0 10px;position:relative;">
+                <span style="position:absolute;left:0;top:100%;">{perc:.2f}%</span>
+                <div style="width:{perc}%;background:{c1};height:100%"></div>
+                <span style="position:absolute;right:0;top:100%;">{100-perc:.2f}%</span>
+            </div>
+            <span>{emoji2}</span>
+        </div>
+    """, unsafe_allow_html=True)
