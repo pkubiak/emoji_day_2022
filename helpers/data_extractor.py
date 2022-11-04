@@ -18,7 +18,7 @@ def extract_tweets(dir: str, date: str):
             yield tweet
 
 
-def collect_available_streams(dir: str = "streams") -> Iterable[str]:
+def collect_available_streams(dir: str = "..\\streams") -> Iterable[str]:
     """Compute list of dates for which we have downloaded streams in `dir` location."""
     dates = set()
     for ext in (".jsonl", ".jsonl.gz"):
@@ -30,6 +30,7 @@ def collect_available_streams(dir: str = "streams") -> Iterable[str]:
                 dates.add(date)
             except ValueError:
                 pass
+    print(dates)
     return sorted(dates)
 
 
@@ -44,6 +45,10 @@ class Collector:
         self.collect(tweets)
 
         return self
+
+    def collect(self, tweets: Iterable[Dict]) -> None:
+        for tweet in tweets:
+            self.collect_tweet(tweet)
 
 
 class TweetsPerHourCollector(Collector):
@@ -68,7 +73,59 @@ class TweetsPerHourCollector(Collector):
         ).sort_values(by=["Day", "Hour"])
 
 
-class EmojiFrequenceCollector(Collector):
+class EmojiCounterPerLanguage(Collector):
+    """Compute statistics of number of emojis in message per language."""
+
+    def clear(self):
+        self.counts = defaultdict(Counter)
+
+    def collect(self, tweets: Iterable[Dict]) -> None:
+        for tweet in tweets:
+            lang = tweet["data"]["lang"]
+            text = tweet["data"]["text"]      
+            emojis = emoji.emoji_list(text)
+            self.counts[lang][len(emojis)] += 1
+
+    def df(self) -> pd.DataFrame:
+        records = []
+        for lang in sorted(self.counts, key=lambda k: sum(self.counts[k].values()), reverse=True):
+            c = ",".join(f"{k}:{v}" for k,v in sorted(self.counts[lang].items()))
+            records.append([lang, c])
+        
+        return pd.DataFrame(
+            records, columns=["Language", "Count"]
+        )
+
+
+# count(key="emoji,lang", "monthly")
+# GenericCollector(key="lang,len(emojis)", period="daily")
+
+class TopLanguageEmojis(Collector):
+    def __init__(self, top_n: int):
+        self.top_n = top_n
+    
+    def clear(self):
+        self.counts = defaultdict(Counter)
+
+    def collect_tweet(self, tweet: Dict) -> None:
+        if tweet["data"]["possibly_sensitive"]:
+            return
+
+        lang = tweet["data"]["lang"]
+        text = tweet["data"]["text"]
+        emojis = {i["emoji"] for i in emoji.emoji_list(text)}
+
+        for e in emojis:
+            self.counts[lang][e] += 1
+
+    def df(self) -> pd.DataFrame:
+        records = []
+        for lang in sorted(self.counts, key=lambda k: sum(self.counts[k].values()), reverse=True):
+            values = ",".join(f"{k}:{v}" for k,v in self.counts[lang].most_common(self.top_n))
+            records.append([lang, values])
+        return pd.DataFrame(records, columns=["Language", "Counts"])
+
+class EmojiFrequencyCollector(Collector):
     """Count frequency of Emojis."""
 
     def clear(self):
@@ -116,9 +173,11 @@ class FieldStatisticsCollector(Collector):
 if __name__ == "__main__":
     collectors = {
         "tweets_per_hour": TweetsPerHourCollector(),
-        "emoji_frequency": EmojiFrequenceCollector(),
+        "emoji_frequency": EmojiFrequencyCollector(),
         "statistics_lang":  FieldStatisticsCollector("data.lang"),
         "statistics_source": FieldStatisticsCollector("data.source"),
+        "emoji_lang_frequency": EmojiCounterPerLanguage(),
+        "top_language_emojis": TopLanguageEmojis(1000)
     }
 
     for date in collect_available_streams():
@@ -127,7 +186,7 @@ if __name__ == "__main__":
 
         for name, collector in collectors.items():
             collector.clear()
-            output_path = os.path.join("data", date, f"{name}.tsv")
+            output_path = os.path.join("..\\data", date, f"{name}.tsv")
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
             if os.path.exists(output_path):
                 print(f"Skipping collecting: {output_path}")
@@ -137,7 +196,7 @@ if __name__ == "__main__":
         if not current_collectors:
             continue
 
-        with tqdm(extract_tweets("streams", date), leave=False) as it:
+        with tqdm(extract_tweets("..\\streams", date), leave=False) as it:
             for tweets in chunk(it):
                 for collector in current_collectors.values():
                     collector <<= tweets

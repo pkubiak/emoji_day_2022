@@ -3,7 +3,7 @@ import streamlit as st
 import os
 import time
 from inspect import currentframe, getframeinfo
-
+import emoji
 
 
 class MultiViewsApp:
@@ -74,7 +74,7 @@ class MultiViewsApp:
     def render(self):
         view_to_render = self._view_to_render()
 
-        view_label = self.mapping[view_to_render]["label"]
+        view_label = emoji.replace_emoji(self.mapping[view_to_render]["label"], replace="").strip()
         st.set_page_config(page_title=f"{view_label} - {self.title}", page_icon=self.icon)
         self._render_sidebar()
         self._render_css()
@@ -97,8 +97,6 @@ def navigate_to(label: str, view: str, params: dict[str, str]={}, key=None) -> N
         frameinfo = getframeinfo(currentframe().f_back)
         seed = f"{view}-{frameinfo.filename}-{frameinfo.lineno}"
         key = f"{view}-{hash(seed)}"
-        print(key)
-
 
     if st.button(label, key=key):
         print(params)

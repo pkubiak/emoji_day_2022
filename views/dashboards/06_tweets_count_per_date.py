@@ -1,12 +1,10 @@
 from distutils.command.build import build
 import streamlit as st
-from utils import get_tsv_data
+from helpers.utils import get_tsv_data
 import pandas as pd
 from bokeh.models import LinearColorMapper, LabelSet, ColumnDataSource
 from bokeh.plotting import figure
 from bokeh.palettes import Viridis256
-
-
 
 
 @st.experimental_memo()
@@ -102,7 +100,7 @@ col2.metric("End Date", df["Day"].max())
 # col3.metric("Total Days", f"{len(days)} days")
 d, h = divmod(total_seconds / 3600.0, 24)
 
-col3.metric("Total time", f"{int(d):d}days {int(h):d}hours")
+col3.metric("Total time", f"{int(d):d}d {int(h):d}h")
 
 ################
 col1, col2, col3 = st.columns(3)

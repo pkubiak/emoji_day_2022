@@ -1,4 +1,4 @@
-from utils import get_tsv_data, render_as_table
+from helpers.utils import get_tsv_data, render_as_table
 import streamlit as st
 from functools import reduce
 import emoji, re

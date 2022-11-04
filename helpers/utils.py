@@ -67,7 +67,7 @@ def render_as_table(items, n_cols: int = 6, limit: int = None) -> str:
     return "\n".join(html)
 
 def get_tsv_data(key: str, **kwargs) -> Iterable[pd.DataFrame]:
-    for path in glob.glob(os.path.join(os.path.dirname(__file__), "data","*",f"{key}.tsv")):
+    for path in glob.glob(os.path.join(os.path.dirname(__file__), "..", "data","*",f"{key}.tsv")):
         df = pd.read_csv(path, sep="\t", **kwargs)
         # dfs.append(df)
         yield df
@@ -91,3 +91,11 @@ def chunk(items, chunk_size: int = 1000):
         cache.append(item)
 
     yield cache
+
+def normalize_emoji(e: str) -> str:
+    for c in [0x1F3FB,0x1F3FC,0x1F3FD,0x1F3FE,0x1F3FF,0xFE0F]:
+        e = e.replace(chr(c), "")
+    
+    e = e.removesuffix("\u200d\u2640")
+    e = e.removesuffix("\u200d\u2642")
+    return e
