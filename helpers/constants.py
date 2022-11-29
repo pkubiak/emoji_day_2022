@@ -1,4 +1,6 @@
 import emoji
+from helpers.utils import normalize_emoji
+
 
 CATEGORIES = {
     "hearts": "💘,💝,💖,💗,💓,💞,💕,💟,❣️,💔,❤️‍🔥,❤️‍🩹,❤️,🧡,💛,💚,🤎,💙,💜,🖤,🤍,🫀,♥️",
@@ -23,19 +25,23 @@ CATEGORIES = {
     "books": "📕,📘,📙,📓,📗,📔,📒",
 }
 
+# CATEGORIES = {
+#     k: ",".join(normalize_emoji(e) for e in v.split(","))
+#     for k, v in CATEGORIES.items()
+# }
 
 def get_by_keyword(keywords: str, verbose=False, ignore=[]) -> str:
     if isinstance(keywords, str):
         keywords = [keywords]
 
-    emojis = []
+    emojis = set()
     for k,v in emoji.EMOJI_DATA.items():
         key = v.get("alias",[]) + [v.get("en","")]
         key = ";".join(f"_{v.strip(':')}_" for v in key)
         if any(k in key for k in keywords) and not any(k in key for k in ignore):
             if verbose:
                 print(v)
-            emojis.append(k)
+            emojis.add(k)
     return ",".join(emojis)
 
 CATEGORIES["countries"] = get_by_keyword("flag_for")

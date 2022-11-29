@@ -42,7 +42,7 @@ def get_data():
 
 ##################
 
-st.title("🏆 Most Common Emojis")
+st.title(__label__)
 st.caption("List of most common emojis")
 
 counts = get_data()

@@ -96,7 +96,26 @@ class EmojiCounterPerLanguage(Collector):
             records, columns=["Language", "Count"]
         )
 
+class EmojiLocationCollector(Collector):
+    def clear(self):
+        self.counts = Counter()
 
+    def collect_tweet(self, tweet: Dict) -> None:
+        from pprint import pprint
+        pprint(tweet)
+        assert False
+        if tweet["data"]["geo"] and "place_id" in tweet["data"]["geo"]:
+            place_id = tweet["data"]["geo"]["place_id"]
+            place = [item for item in tweet["includes"]["places"] if item["id"] == place_id]
+            assert len(place) == 1
+            place = place[0]
+
+            self.counts[place["country"]] += 1
+        else:
+            self.counts[None] += 1
+
+    def df(self):
+        print(self.counts.most_common(100), len(self.counts), sum(self.counts.values()))
 # count(key="emoji,lang", "monthly")
 # GenericCollector(key="lang,len(emojis)", period="daily")
 
@@ -172,12 +191,13 @@ class FieldStatisticsCollector(Collector):
 
 if __name__ == "__main__":
     collectors = {
-        "tweets_per_hour": TweetsPerHourCollector(),
-        "emoji_frequency": EmojiFrequencyCollector(),
-        "statistics_lang":  FieldStatisticsCollector("data.lang"),
-        "statistics_source": FieldStatisticsCollector("data.source"),
-        "emoji_lang_frequency": EmojiCounterPerLanguage(),
-        "top_language_emojis": TopLanguageEmojis(1000)
+        # "tweets_per_hour": TweetsPerHourCollector(),
+        # "emoji_frequency": EmojiFrequencyCollector(),
+        # "statistics_lang":  FieldStatisticsCollector("data.lang"),
+        # "statistics_source": FieldStatisticsCollector("data.source"),
+        # "emoji_lang_frequency": EmojiCounterPerLanguage(),
+        # "top_language_emojis": TopLanguageEmojis(1000)
+        "test": EmojiLocationCollector(),
     }
 
     for date in collect_available_streams():
@@ -197,10 +217,13 @@ if __name__ == "__main__":
             continue
 
         with tqdm(extract_tweets("..\\streams", date), leave=False) as it:
-            for tweets in chunk(it):
-                for collector in current_collectors.values():
-                    collector <<= tweets
-
+            try:
+                for tweets in chunk(it):
+                    for collector in current_collectors.values():
+                        collector <<= tweets
+            except EOFError as e:
+                print(e)
+            
         for output_path, collector in current_collectors.items():
             df = collector.df()
 

@@ -66,11 +66,14 @@ def render_as_table(items, n_cols: int = 6, limit: int = None) -> str:
 
     return "\n".join(html)
 
-def get_tsv_data(key: str, **kwargs) -> Iterable[pd.DataFrame]:
+def get_tsv_data(key: str, with_dates=False, **kwargs) -> Iterable[pd.DataFrame]:
     for path in glob.glob(os.path.join(os.path.dirname(__file__), "..", "data","*",f"{key}.tsv")):
         df = pd.read_csv(path, sep="\t", **kwargs)
-        # dfs.append(df)
-        yield df
+        if with_dates:
+            date = path.split(os.sep)[-2]
+            yield date, df
+        else:
+            yield df
     # return pd.concat(dfs, ignore_index=True)
 
 

@@ -44,6 +44,7 @@ def get_data():
         for k in CATEGORIES:
             best.setdefault(k, None)
         # print(lang, best)
+        # best["name"] = "xxx"
         best["total"] = sum(emojis.values())
         best["language"] = lang
         results.append(best)
@@ -57,7 +58,7 @@ def get_data():
     return best
 
 
-st.title("📊 Top Emojis by Category and Language")
+st.title(__label__)
 st.write(get_data())
 
 if False:
@@ -89,5 +90,6 @@ if False:
     # Plot!
 
     st.title("🌍 Top Emojis by Country")
+    
     st.plotly_chart(fig, use_container_width=True)
 

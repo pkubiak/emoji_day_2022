@@ -66,10 +66,11 @@ class MultiViewsApp:
 
     def _render_view(self, view: str):
         path = self.mapping[view]["path"]
+        label = self.mapping[view]["label"]
 
         with open(os.path.join("views", path), encoding="utf-8") as file:
             code = compile(file.read(), path, mode='exec')
-            exec(code, dict(__view__=view))
+            exec(code, dict(__view__=view, __label__=label))
 
     def render(self):
         view_to_render = self._view_to_render()

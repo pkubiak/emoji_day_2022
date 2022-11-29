@@ -1,6 +1,6 @@
 from typing import List, Dict
 import emoji
-from collections import Counter
+from collections import Counter, defaultdict
 import pandas as pd
 from helpers.utils import render_as_table, sum_tsv_data, normalize_emoji
 import streamlit as st
@@ -24,6 +24,7 @@ from helpers.constants import CATEGORIES
 #     "shoes": "👞,👟,🥾,🥿,👠,👡,🩰,👢",
 # }
 
+
 @st.experimental_memo()
 def get_data():
     # TODO: Add source filtering
@@ -31,30 +32,41 @@ def get_data():
     df = sum_tsv_data("emoji_frequency", index_col="Emoji", dtype={"Count": "int"})
     df["Count"] = df["Count"].astype("int")
 
+    most_common = defaultdict(Counter)
+    for idx, row in df.iterrows():
+        e = normalize_emoji(idx)
+        most_common[e][idx] += int(row["Count"])
+
+    most_common = {
+        k: v.most_common()[0][0] for k, v in most_common.items()
+    }
     counts = Counter()
     for idx, row in df.iterrows():
         e = normalize_emoji(idx)
+        e = most_common[e]
         counts[e] += int(row["Count"])
 
-    return counts
+    return most_common, counts
 
 
 #############
 
-counts = get_data()
+most_common,  counts = get_data()
 
-st.title("📊 Top Emojis by Category")
+st.title(__label__)
 
+st.markdown("Note: Different variants of the same emoji are counted together!")
 
 # TODO: Sort categories by total count
 # TODO: display hover title
 categories_counts = {
-    c: sum(counts.get(e,0) for e in CATEGORIES[c].split(","))
+    c: sum(counts.get(most_common[normalize_emoji(e)],0) for e in CATEGORIES[c].split(","))
     for c in CATEGORIES
 }
+
 for name, emojis in sorted(CATEGORIES.items(), key=lambda item: categories_counts[item[0]], reverse=True):
     category_counts = {
-        k: counts.get(k, 0)
+        k: counts.get(most_common[normalize_emoji(k)], 0)
         for k in emojis.split(",")
     }
 

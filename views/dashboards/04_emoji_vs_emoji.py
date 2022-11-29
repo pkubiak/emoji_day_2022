@@ -19,6 +19,8 @@ def get_data():
                 counts[lang][k] += int(v)
     return counts
 
+
+@st.experimental_memo()
 def get_results(e1, e2) -> dict[str, str]:
     counts = get_data()
     results = {}
@@ -45,7 +47,7 @@ def get_results(e1, e2) -> dict[str, str]:
     return results, overall
 
 
-st.title("🥊 Emoji vs Emoji")
+st.title(__label__)
 st.markdown("""
 Dashboard compare usage of two emoji among different countries, and show the most used.
 
@@ -86,6 +88,7 @@ if (emoji1 not in emoji.EMOJI_DATA) or (emoji2 not in emoji.EMOJI_DATA):
     st.error("Inserted text is not emoji!")
     st.stop()
 
+st.experimental_set_query_params(v=__view__, q=f"{emoji1}vs{emoji2}")
 
 results, overall = get_results(emoji1, emoji2)
 keys = list(results.keys())
@@ -129,3 +132,6 @@ with output:
             <span>{emoji2}</span>
         </div>
     """, unsafe_allow_html=True)
+
+
+st.write(st.experimental_get_query_params())

@@ -67,20 +67,48 @@ def get_data() -> pd.DataFrame:
     df.sort_values(by="Total", ascending=False, inplace=True)
     return df
 
+def get_stats(df):
+    stats = [[], []]
+    for key in ["Neutral", "Female", "Male"]:
+        i = df[key].argmax()
+        stats[0].append("%s (%.2f%%)" % (df["Emoji"].iloc[i], df[key].iloc[i]))
+
+    for key in ["Neutral", "Female", "Male"]:
+        i = df[key].argmin()
+        stats[1].append("%s (%.2f%%)" % (df["Emoji"].iloc[i], df[key].iloc[i]))
+
+    return pd.DataFrame(stats, columns=["Neutral", "Female", "Male"], index=["Highest (%)", "Lowest (%)"])
+
+
+st.title(__label__)
+st.markdown("""
+    Part of the emoji, representing occupations and roles, comes in three variants-neutral,
+    feminine and masculine. The following analysis shows the share of variants for the most popular emoji.
+""")
+
 df = get_data()
 
-st.dataframe(df)
+
+st.table(get_stats(df))
+
+st.markdown("""
+    The results of the analysis may be affected by the fact that the appearance of neutral variants varies
+    depending on the style of emoji (different systems / devices) which in some cases may make them more
+    similar to female or male versions.
+""")
+st.subheader("Details")
+st.dataframe(df, use_container_width=True)
 
 #---------
-st.subheader("Twitter Emoji Preview")
+# st.subheader("Twitter Emoji Preview")
 
-output = []
+# output = []
 
-for i in df["Emoji"]:
-    line = []
-    for m in ["", "\u200d\u2640\ufe0f", "\u200d\u2642\ufe0f"]:
-        url = render_emoji_as_image(i+m)
-        line.append(f'<img src="{url}" style="height:48px"/>')
-    output.append("".join(line))
+# for i in df["Emoji"]:
+#     line = []
+#     for m in ["", "\u200d\u2640\ufe0f", "\u200d\u2642\ufe0f"]:
+#         url = render_emoji_as_image(i+m)
+#         line.append(f'<img src="{url}" style="height:48px"/>')
+#     output.append("".join(line))
 
-st.markdown("<br>".join(output), unsafe_allow_html=True)
+# st.markdown("<br>".join(output), unsafe_allow_html=True)

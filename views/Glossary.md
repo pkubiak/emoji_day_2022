@@ -1,14 +1,42 @@
-### Variant Selector (0xFE0F)
-TBA 
+### Variation Selectors (0xFE0E / 0xFE0F)
+
+An invisible codepoint which specifies that the preceding character should be displayed with or without emoji presentation.
 
 
 <table>
-<tr><th>Heart without Varian Selector</th><td>&#x2764;</td></tr>
-<tr><th>Heart with Varian Selector</th><td>&#x2764;&#xFE0F;</td></tr>
+<tr><th>without Variant Selector (default)</th><td>0x2764</td><td>&#x2764;</td></tr>
+<tr><th>with Emoji Variant Selector (0xFE0E)</th><td>0x2764 + 0xFE0F</td><td>&#x2764;&#xFE0F;</td></tr>
+<tr><th colspan="3"></th></tr>
+<tr><th>without Variant Selector (default)</th><td>0x1F44D</td><td>&#x1F44D;</td></tr>
+<tr><th>with Text Variant Selector (0xFE0E)</th><td>0x1F44D + 0xFE0E</td><td>&#x1F44D;&#xFE0E;</td></tr>
 </table>
+<br>
+
+
+ref: https://en.wikipedia.org/wiki/Variation_Selectors_(Unicode_block)
+
 
 ### Zero Width Joiner (0x200D)
-TBA
+
+ZWJ character is used to combine multiple (two or more) emojis into single glyph.
+
+<table>
+<tr>
+    <th>Man Firefighter</th>
+    <td>0x1F468 + 0x200D + 0x1F692</td>
+    <td>&#x1F468; + ZWJ + &#x1F692; = &#x1F468;&#x200D;&#x1F692; </td>
+</tr>
+<tr>
+    <th>Family with Mother and Two Sons</th>
+    <td>0x1F469 + 0x200D + 0x1F466 + 0x200D + 0x1F466</td>
+    <td>&#x1F469; + ZWJ + &#x1F466; + ZWJ + &#x1F466; = &#x1F469;&#x200D;&#x1F466;&#x200D;&#x1F466;</td>
+</tr>
+</table>
+<br>
+
+
+more examples: https://family-emoji.org/
+
 
 
 ### Skin Tone Modifier (0x1F3FB - 0x1F3FF)
@@ -32,22 +60,20 @@ TBA
 </table>
 
 
-### Letters (?? - ??)
-TBA
+<!-- ### Letters (?? - ??)
+TBA -->
 
 
-## Twitter
-
-### Language Codes
+### Twitter Language Codes
 
 Three letter special codes:
 
 - **und** - Undetermined
-- **zxx** - Sensitive content?
+- **zxx** - Sensitive content
 - **qme** - Only media
 - **qam** - Only mentions
-- **art** - Art related?
+- **art** - Art related
 - **qst** - Short utterances (single word)
 - **qht** - Only hastags
-- **ckb** -
+- **ckb** - Arabic languages
 - **qct** - Only cashtags

@@ -7,10 +7,12 @@ VIEWS = [
     "Emoji Statistics",
     ("🏆 Most common emojis", "most-common-emojis", "dashboards/01_most_common_emojis.py"),
     ("💗 Top Emojis by category", "top-emojis-by-category", "dashboards/02_top_emojis_by_category.py"),
-    ("\uFE0F♂️\uFE0F vs ♀️\uFE0F", "gender-bias", "dashboards/05_gender_bias.py"),
-
-    "Per Language",
-    ("🌍 Top Emojis in country", "top-by-country-and-language", "dashboards/03_top_emojis_by_category_and_language.py"),
+    ("👫 Gender Bias", "gender-bias", "dashboards/05_gender_bias.py"),
+    ("📈 Emoji Trends", "emoji-trends", "dashboards/09_emoji_trends.py"),
+    
+    "Languages & Countries",
+    # ("📈 Language Statistics", "language-statistics", "dashboards/08_language_statistics.py"),
+    ("🌍 Top Emojis by language", "top-emojis-by-language", "dashboards/03_top_emojis_by_language.py"),
     ("🥊 Emoji vs Emoji", "emoji-vs-emoji", "dashboards/04_emoji_vs_emoji.py"),
 
     "Tweets Statistics",
