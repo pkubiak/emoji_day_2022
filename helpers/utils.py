@@ -44,7 +44,7 @@ def render_as_table(items, n_cols: int = 6, limit: int = None) -> str:
     html = [
         "<style>td:hover{background:#eee}</style>"
     ]
-    html += ['<table style="table-layout:fixed;width:100%;empty-cells:hide;">']
+    html += ['<table style="table-layout:fixed;width:100%;empty-cells:hide;" class="emoji">']
     for row in range((len(items)+n_cols-1) // n_cols):
         html += ["<tr>"]
         for col in range(n_cols):

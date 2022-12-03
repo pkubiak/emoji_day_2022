@@ -35,7 +35,7 @@ col1.metric("Total emojis", f"{total:,d}")
 col2.metric("Unique emojis", f"{len(counts):,d}")
 
 
-st.subheader("Ranking")
+st.header("Ranking")
 
 show_as = st.radio("Show as:", ("counts", "percentage"), horizontal=True)
 

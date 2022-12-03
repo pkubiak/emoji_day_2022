@@ -94,10 +94,23 @@ st.table(get_stats(df))
 st.markdown("""
     The results of the analysis may be affected by the fact that the appearance of neutral variants varies
     depending on the style of emoji (different systems / devices) which in some cases may make them more
-    similar to female or male versions.
+    similar to female or male variants.
+
+    ⚠&#xfe0f; In that analysis different skin tone variants has been merged together.
 """)
 st.subheader("Details")
-st.dataframe(df, use_container_width=True)
+
+# df = df.set_index('Emoji')
+style = df.style
+style = style.format(   
+    precision=2,
+    thousands=",",
+    formatter={
+        "Neutral": "{:.2f}%",
+        "Female": "{:.2f}%",
+        "Male": "{:.2f}%",
+    }).hide()
+st.dataframe(style, use_container_width=True)
 
 #---------
 # st.subheader("Twitter Emoji Preview")

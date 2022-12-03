@@ -55,18 +55,19 @@ most_common,  counts = get_data()
 
 st.title(__label__)
 
-st.markdown("Note: Different variants of the same emoji are counted together!")
+st.markdown("Note: Different variants of the same emoji have been merged together!")
 
 # TODO: Sort categories by total count
 # TODO: display hover title
+
 categories_counts = {
-    c: sum(counts.get(most_common[normalize_emoji(e)],0) for e in CATEGORIES[c].split(","))
+    c: sum(counts.get(most_common.get(normalize_emoji(e), e),0) for e in CATEGORIES[c].split(","))
     for c in CATEGORIES
 }
 
 for name, emojis in sorted(CATEGORIES.items(), key=lambda item: categories_counts[item[0]], reverse=True):
     category_counts = {
-        k: counts.get(most_common[normalize_emoji(k)], 0)
+        k: counts.get(most_common.get(normalize_emoji(k), k), 0)
         for k in emojis.split(",")
     }
 
