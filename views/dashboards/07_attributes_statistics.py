@@ -15,12 +15,41 @@ def get_data(key: str):
     return df.head(500)
 
 
-col1, col2 = st.columns([2,3])
+def build_tab(label, data):
+    st.subheader(label)
 
-with col1:
-    st.subheader("Tweet Language")
-    st.table(get_data("lang"))
+    head = data.head(10)['%']
+    head.loc['other'] = 100.0 - head.sum()
+    head = head.reset_index()
 
-with col2:
-    st.subheader("Tweet Source")
-    st.table(get_data("source"))
+    chart = alt.Chart(head).mark_bar().encode(
+        x=alt.X('Value', type='nominal', sort=None),
+        y="%:Q",
+        color=alt.condition(
+            alt.datum.Value == 'other',
+            alt.value('orange'),
+            alt.value('steelblue') 
+        )
+    ).properties(
+        title="Top 10 values",
+        height=300,
+    )
+
+    st.altair_chart(chart, use_container_width=True)
+
+    with st.expander("See details"):
+        st.table(data)
+
+st.title(__label__)
+
+tab1, tab2 = st.tabs(["Language", "Source"])
+import altair as alt
+
+with tab1:
+    df = get_data("lang")
+
+    build_tab("Tweet Language", df)
+    
+with tab2:
+    data = get_data("source")
+    build_tab("Tweet Source", data)
