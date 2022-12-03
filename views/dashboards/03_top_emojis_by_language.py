@@ -48,7 +48,7 @@ def get_data():
         best["total"] = sum(emojis.values())
         best["language"] = lang
         results.append(best)
-    print(missing.most_common(200))
+    # print(missing.most_common(200))
     keys = sorted(CATEGORIES, key=categories_count.__getitem__, reverse=True)
     return pd.DataFrame(results, columns=["language", "total"] + keys).set_index("language").sort_values(by=["total"], ascending=False)
 

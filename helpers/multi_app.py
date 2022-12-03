@@ -100,7 +100,6 @@ def navigate_to(label: str, view: str, params: dict[str, str]={}, key=None) -> N
         key = f"{view}-{hash(seed)}"
 
     if st.button(label, key=key):
-        print(params)
         st.experimental_set_query_params(v=view, **params)
         time.sleep(0.1)
         st.experimental_rerun()

@@ -77,8 +77,6 @@ st.title(f"{emoji_input} ({emoji.demojize(emoji_input).strip(':')})")
 data = get_data(emoji_input)
 df = pd.DataFrame.from_records(list(data.items()), columns=["Date", "Frequency"])
 
-print(df)
-
 
 st.line_chart(df, x="Date", y="Frequency")
 

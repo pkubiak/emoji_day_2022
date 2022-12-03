@@ -13,10 +13,8 @@ def get_data():
     records = {}
     for date, df in data:
         df["%"] = 100*df["Count"] / df["Count"].sum()
-        # print(date, i.head(5))
         # records[date] = list(f"{idx} ({row['%']:.2f}%)" for idx, row in df.head(5).iterrows())
         records[date] = list(f"{idx}" for idx, row in df.head(13).iterrows())
-    print(records)
 
     return pd.DataFrame.from_dict(records, orient="index")#, columns=["1st", "2nd", "3rd", "4th", "5th"])
 
