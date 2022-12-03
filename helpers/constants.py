@@ -41,7 +41,7 @@ def get_by_keyword(keywords: str, verbose=False, ignore=[]) -> str:
         if any(k in key for k in keywords) and not any(k in key for k in ignore):
             if verbose:
                 print(v)
-            emojis.add(k)
+            emojis.add(normalize_emoji(k))
     return ",".join(emojis)
 
 CATEGORIES["countries"] = get_by_keyword("flag_for")
