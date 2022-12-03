@@ -2,6 +2,6 @@ emoji
 requests
 tqdm
 pandas
-bokeh
+bokeh==2.4.3
 plotly
-streamlit==1.14.0
+streamlit==1.15.0
