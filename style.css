@@ -28,3 +28,11 @@ section[data-testid="stSidebar"] button[kind=secondary]:hover {
 .emoji {
     font-family: Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,Android Emoji,EmojiSymbols,EmojiOne Mozilla,Twemoji Mozilla,Segoe UI Symbol,Noto Color Emoji Compat,emoji,'Noto Emoji';
 }
+
+ul.contains-task-list {
+    list-style-type:none
+}
+
+.contains-task-list li {
+    padding-left: 0;
+}

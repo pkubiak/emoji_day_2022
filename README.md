@@ -23,23 +23,15 @@ To celebrate Emoji Day 2022, I decided to create some analytical dashboard about
     - dashboards are implemented in `views/dashboards/` directory,
     - dashboard use already precomputed data from `.tsv` dumps,
     - dashboards are attached to the main application in `main.py` file
+    - python module `emoji` is used to manipulate emojis in strings
+    - in client browser missing emojis are rendered using `Noto Emoji` font from https://fonts.google.com/
 
-## 💪 Checklist
-- [x] Create own system for multipage dashobard:
-    - [x] Support custom menu building
-    - [x] Allows to navigate views with buttons
-- [x] Implement constant collection of Twitter logs
-    - [x] using vm on Google Cloud Engine
-- [ ] Prepare analytical dashboards:
-    - [ ] Emoji Statistic:
-        - [x] Overall most common emojis
-        - [x] Most common emoji by categories (faces, animals, etc.)
-        - [ ] 👷 Gender bias analysis
-    - [ ] Language correlations: 
-        - [x] Most common emoji in each category by language
-        - [x] Comparison of two emojis popularity on map
-        - [ ] 👷‍♀️ Number of emoji per tweet by language
-    - [ ] Tweets Statistics:
-        - [x] Number of collected tweets per date
-        - [ ] 👷‍♀️ Histogram of values for different tweets parameters (language, source, etc.)
-- [ ] 👷‍♀️ Prepare glossary
+
+## 💡 Further Ideas
+
+- [ ] Add more emoji to gender bias visualisation
+- [ ] Daily Top emoji ranking
+- [ ] How often emojis are used in different languages / countries
+- [ ] Emoji n-grams 
+- [ ] Emoji co-occurences
+- [ ] Emojis from different standards
