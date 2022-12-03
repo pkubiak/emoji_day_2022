@@ -57,7 +57,7 @@ def render_as_table(items, n_cols: int = 6, limit: int = None) -> str:
 
             if type(value) == int:
                 value = f"{value:,d}"
-            else:
+            elif type(value) == float:
                 value = "<0.001%" if value < 0.001 else f"{value:.3f}%"
 
             html += [f"<td{title}>{key}<span style='float:right'>{value}</span></td>"]
